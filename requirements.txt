@@ -205,4 +205,3 @@ wheel==0.45.1
 wrapt==1.17.2
 xlrd==2.0.1
 yfinance==0.2.65
-mediapipe>=0.10,<0.11
