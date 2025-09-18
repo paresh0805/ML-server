@@ -14,7 +14,7 @@ CORS(app)  # allow requests from frontend
 MODEL_PATH = "road_classifier.h5"  # rename your file accordingly
 CLASS_MAP_PATH = "class_indices.json"
 
-model = load_model(MODEL_PATH)
+model = load_model("road_classifier.h5")
 
 with open(CLASS_MAP_PATH, "r") as f:
     class_indices = json.load(f)
