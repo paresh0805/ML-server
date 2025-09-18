@@ -15,15 +15,17 @@ CLASS_MAP_PATH = "class_indices.json"
 IMG_SIZE = (224, 224)
 
 # Safe model loading
-model = None
-if os.path.exists(MODEL_PATH):
-    try:
-        model = load_model(MODEL_PATH)
-        print(f"Model loaded from {MODEL_PATH}")
-    except Exception as e:
-        print(f"Error loading model: {e}")
-else:
-    print(f"Model file not found at {MODEL_PATH}")
+# model = None
+# if os.path.exists(MODEL_PATH):
+#     try:
+
+model = load_model(MODEL_PATH)
+#         model = load_model(MODEL_PATH)
+#         print(f"Model loaded from {MODEL_PATH}")
+#     except Exception as e:
+#         print(f"Error loading model: {e}")
+# else:
+#     print(f"Model file not found at {MODEL_PATH}")
 
 # Load class mapping safely
 index_to_class = {}
