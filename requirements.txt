@@ -6,7 +6,5 @@ opencv-python==4.11.0.86
 pandas==2.3.0
 numpy==1.26.4
 Pillow==11.2.1
-requests
-tensorflow
-json
-
+requests==2.32.5
+tensorflow==2.15.0
