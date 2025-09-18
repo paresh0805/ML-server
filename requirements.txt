@@ -7,6 +7,6 @@ pandas==2.3.0
 numpy==1.26.4
 Pillow==11.2.1
 requests
-tenserflow
+tensorflow
 json
 
