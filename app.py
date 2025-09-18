@@ -4,25 +4,37 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import numpy as np
 import json
-import io
 from PIL import Image
+import os
 
 app = Flask(__name__)
-CORS(app)  # allow requests from frontend
+CORS(app)
 
-# Load ML model and class mapping once at startup
-MODEL_PATH = "road_classifier.h5"  # rename your file accordingly
+MODEL_PATH = "road_classifier.h5"  # or folder if SavedModel
 CLASS_MAP_PATH = "class_indices.json"
-
-model = load_model("road_classifier.h5")
-
-with open(CLASS_MAP_PATH, "r") as f:
-    class_indices = json.load(f)
-index_to_class = {v: k for k, v in class_indices.items()}  # safer mapping
-
 IMG_SIZE = (224, 224)
 
-# Dummy users for testing login
+# Safe model loading
+model = None
+if os.path.exists(MODEL_PATH):
+    try:
+        model = load_model(MODEL_PATH)
+        print(f"Model loaded from {MODEL_PATH}")
+    except Exception as e:
+        print(f"Error loading model: {e}")
+else:
+    print(f"Model file not found at {MODEL_PATH}")
+
+# Load class mapping safely
+index_to_class = {}
+if os.path.exists(CLASS_MAP_PATH):
+    with open(CLASS_MAP_PATH, "r") as f:
+        class_indices = json.load(f)
+    index_to_class = {v: k for k, v in class_indices.items()}
+else:
+    print(f"Class mapping file not found at {CLASS_MAP_PATH}")
+
+# Dummy users
 users = [
     {"email": "test@example.com", "password": "123456", "department": "water"},
     {"phone": "9876543210", "password": "123456", "department": "electricity"},
@@ -52,6 +64,9 @@ def login():
 
 @app.route("/predict", methods=["POST"])
 def predict():
+    if model is None:
+        return jsonify({"success": False, "message": "Model not loaded"}), 500
+
     if "image" not in request.files:
         return jsonify({"success": False, "message": "No image file provided"}), 400
     
@@ -65,7 +80,7 @@ def predict():
 
         preds = model.predict(img_array)
         pred_index = np.argmax(preds)
-        label = index_to_class[pred_index]
+        label = index_to_class.get(pred_index, "Unknown")
         confidence = float(preds[0][pred_index])
 
         return jsonify({
