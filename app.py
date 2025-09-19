@@ -10,6 +10,8 @@ from PIL import Image
 # Flask app
 app = Flask(__name__)
 CORS(app)
+with open("class_indices.json", "r") as f:
+    class_indices = json.load(f)
 
 # Load MobileNet model
 MODEL_PATH = "road_classifier.h5"
@@ -36,13 +38,16 @@ def predict():
     img = Image.open(filepath).resize((224, 224))
     img_array = image.img_to_array(img) / 255.0
     img_array = np.expand_dims(img_array, axis=0)
+    predicted_label = class_indices.get(str(pred_class_index), "Unknown")
 
     # Predict
     preds = model.predict(img_array)
     pred_class = np.argmax(preds, axis=1)
 
-    return jsonify({"prediction": int(pred_class[0])})
-    
+    return jsonify({
+        "prediction_index": pred_class_index,
+        "prediction_label": predicted_label
+    })
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
 
