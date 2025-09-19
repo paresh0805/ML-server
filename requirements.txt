@@ -1,13 +1,12 @@
 Flask==2.3.3
 flask-cors==4.0.0
 gunicorn==23.0.0
-openai==1.95.1
 opencv-python==4.10.0.84
 pandas==2.2.3
-numpy==1.26.4
+numpy>=2.1.0
 Pillow==11.0.0
-requests==2.32.3
 tensorflow-cpu==2.20.0
 h5py==3.12.1
+
 
 
