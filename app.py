@@ -1,4 +1,5 @@
 import os
+import json  # ✅ Missing import added
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import tensorflow as tf
@@ -10,6 +11,8 @@ from PIL import Image
 # Flask app
 app = Flask(__name__)
 CORS(app)
+
+# ✅ Load class indices from JSON
 with open("class_indices.json", "r") as f:
     class_indices = json.load(f)
 
@@ -38,16 +41,17 @@ def predict():
     img = Image.open(filepath).resize((224, 224))
     img_array = image.img_to_array(img) / 255.0
     img_array = np.expand_dims(img_array, axis=0)
-    predicted_label = class_indices.get(str(pred_class_index), "Unknown")
 
-    # Predict
+    # ✅ Predict
     preds = model.predict(img_array)
-    pred_class = np.argmax(preds, axis=1)
+    pred_class_index = int(np.argmax(preds, axis=1)[0])  # Must be defined before using it
+    predicted_label = class_indices.get(str(pred_class_index), "Unknown")  # ✅ Now safe
 
     return jsonify({
         "prediction_index": pred_class_index,
         "prediction_label": predicted_label
     })
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
 
