@@ -48,7 +48,7 @@ def predict():
     predicted_label = class_indices.get(str(pred_class_index), "Unknown")  # ✅ Now safe
 
     return jsonify({
-        "prediction_index": pred_class_index,
+        "
         "prediction_label": predicted_label
     })
 
