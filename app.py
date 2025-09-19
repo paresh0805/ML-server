@@ -93,7 +93,7 @@ def generate_description(label):
     prompt = f"Describe the following type of road-related issue or object in 2-3 sentences: {label}."
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # or "gpt-4" if you have access
+            model="gpt-3.5-turbo",  
             messages=[
                 {"role": "system", "content": "You are an assistant that describes road-related issues detected by AI models."},
                 {"role": "user", "content": prompt}
