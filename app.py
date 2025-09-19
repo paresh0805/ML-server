@@ -12,7 +12,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Load MobileNet model
-MODEL_PATH = "mobilenet_model.h5"
+MODEL_PATH = "road_classifier.h5"
 model = load_model(MODEL_PATH)
 
 # Create uploads folder
