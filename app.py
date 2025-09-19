@@ -57,7 +57,7 @@
 #     app.run(host="0.0.0.0", port=5000)
 import os
 import json
-import openai  # ✅ Required
+import openai  
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import tensorflow as tf
@@ -65,8 +65,10 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import numpy as np
 from PIL import Image
+from dotenv import load_dotenv
+import os
 
-# ✅ Setup OpenAI API key
+load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")  # or hardcode for dev only (not recommended)
 
 # Flask app
@@ -86,7 +88,7 @@ model = load_model(MODEL_PATH)
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# ✅ OpenAI description function
+
 def generate_description(label):
     prompt = f"Describe the following type of road-related issue or object in 2-3 sentences: {label}."
     try:
