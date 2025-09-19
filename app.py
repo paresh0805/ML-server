@@ -1,64 +1,48 @@
-
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import numpy as np
-import json
 from PIL import Image
-import io
 
+# Flask app
 app = Flask(__name__)
-CORS(app)  # Allow requests from frontend
+CORS(app)
 
-# === Configuration ===
-MODEL_PATH = "road_classifier.h5"
-CLASS_MAP_PATH = "class_indices.json"
-IMG_SIZE = (224, 224)
-
-# === Load model ===
+# Load MobileNet model
+MODEL_PATH = "mobilenet_model.h5"
 model = load_model(MODEL_PATH)
 
-# === Load class indices ===
-with open(CLASS_MAP_PATH, "r") as f:
-    class_indices = json.load(f)
+# Create uploads folder
+UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Invert class_indices to get index -> class name mapping
-index_to_class = {v: k for k, v in class_indices.items()}
+@app.route("/", methods=["GET"])
+def home():
+    return jsonify({"message": "🚀 MobileNet Image Detector API is running!"})
 
-# === Prediction route ===
 @app.route("/predict", methods=["POST"])
 def predict():
-    if "image" not in request.files:
-        return jsonify({"success": False, "message": "No image file provided"}), 400
+    if "file" not in request.files:
+        return jsonify({"error": "No file provided"}), 400
 
-    img_file = request.files["image"]
+    file = request.files["file"]
+    filepath = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(filepath)
 
-    try:
-        # Read image into PIL format
-        img = Image.open(img_file).convert("RGB")
-        img = img.resize(IMG_SIZE)
-        img_array = np.array(img) / 255.0
-        img_array = np.expand_dims(img_array, axis=0)
+    # Load and preprocess image
+    img = Image.open(filepath).resize((224, 224))
+    img_array = image.img_to_array(img) / 255.0
+    img_array = np.expand_dims(img_array, axis=0)
 
-        # Make prediction
-        preds = model.predict(img_array)
-        pred_index = np.argmax(preds)
-        label = index_to_class[pred_index]
-        confidence = float(preds[0][pred_index])
+    # Predict
+    preds = model.predict(img_array)
+    pred_class = np.argmax(preds, axis=1)
 
-        return jsonify({
-            "success": True,
-            "label": label,
-            "confidence": confidence
-        })
-
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "message": f"Prediction error: {str(e)}"
-        }), 500
-
-# === Run the app ===
+    return jsonify({"prediction": int(pred_class[0])})
+    
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
+
